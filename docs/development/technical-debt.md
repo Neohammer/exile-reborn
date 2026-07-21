@@ -118,8 +118,8 @@ avec certificats locaux valides.
   provider Docker (`exposedByDefault: false`, routage par labels
   `traefik.http.routers.*`) + provider file pour le TLS
   (`.docker/traefik/dynamic/tls.yml`). Dashboard sur `http://localhost:8080`
-  (mode insecure, dev uniquement). Entrypoint `web` (80) redirige vers
-  `websecure` (443).
+  (mode insecure, dev uniquement). Seul l'entrypoint `websecure` (443) est
+  déclaré et publié : pas de port 80, pas de fallback HTTP.
 - **Certificats** : générés avec mkcert (`make certs`), stockés dans
   `.docker/traefik/certs/` (gitignoré, jamais commité). Un seul certificat
   multi-SAN couvre les 4 domaines. Nécessite `mkcert -install` une fois par

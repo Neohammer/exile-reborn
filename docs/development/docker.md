@@ -186,7 +186,7 @@ Le service `schemaspy` (profil `tools`) n'est pas dans cette liste : il génère
 | Redis | localhost:6379 |
 | Mailpit | http://localhost:8025 |
 | db-docs (accès direct) | http://localhost:8090 |
-| Traefik (HTTP/HTTPS) | 80 / 443 |
+| Traefik (HTTPS uniquement) | 443 |
 | Traefik (dashboard) | http://localhost:8080 |
 
 ---
