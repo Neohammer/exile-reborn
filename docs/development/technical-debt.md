@@ -194,7 +194,7 @@ Le dump brut ne s'importait pas tel quel dans l'image `postgres:10` (Linux) :
 
 ## Reste à faire
 
-- analyse et documentation du schéma (SchemaSpy).
+Rien : import et documentation du schéma sont terminés (voir section SchemaSpy ci-dessous).
 
 ---
 
@@ -202,7 +202,7 @@ Le dump brut ne s'importait pas tel quel dans l'image `postgres:10` (Linux) :
 
 ## SchemaSpy
 
-Statut : À faire
+Statut : Fait
 
 Priorité : Moyenne
 
@@ -217,6 +217,24 @@ Utilisation :
 - support Claude Code.
 
 Les fichiers générés ne doivent pas être versionnés.
+
+## Solution
+
+Service `schemaspy` ajouté dans `compose.yaml` avec le profil Docker Compose
+`tools` (ne démarre jamais avec `make start`). Lancement via :
+
+```bash
+make schema-doc
+```
+
+Sortie dans `docs/database/generated/` (gitignoré).
+
+Point d'attention : le type de base `-t pgsql11` interroge `pg_proc.prokind`
+(colonne introduite en PostgreSQL 11), absente de notre PostgreSQL 10 —
+utiliser `-t pgsql` (générique) à la place, sous peine de perdre la
+documentation des fonctions.
+
+Voir [docs/database/README.md](../database/README.md) pour le détail des schémas.
 
 ---
 

@@ -75,6 +75,41 @@ services:
       - exile-network
 
 
+  schemaspy:
+
+    container_name: exile-schemaspy
+
+    image: schemaspy/schemaspy:latest
+
+    profiles:
+      - tools
+
+    depends_on:
+      - postgres
+
+    volumes:
+      - ../docs/database/generated:/output
+
+    command:
+      - -t
+      - pgsql
+      - -host
+      - postgres
+      - -port
+      - "5432"
+      - -db
+      - exile
+      - -u
+      - exile
+      - -p
+      - exile
+      - -schemas
+      - public,exile_nexus,exile_s03,static
+
+    networks:
+      - exile-network
+
+
 
 volumes:
 

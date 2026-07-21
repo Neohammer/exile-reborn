@@ -61,6 +61,11 @@ reset-db: db-prepare
 	$(COMPOSE) up -d
 
 
+## Generate database schema documentation (SchemaSpy)
+schema-doc:
+	$(COMPOSE) --profile tools run --rm schemaspy
+
+
 ## Composer install in PHP container
 composer-install:
 	docker exec exile-php composer install

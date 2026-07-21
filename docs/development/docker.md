@@ -139,11 +139,14 @@ make reset-db
 
 Elle provoque :
 
+- régénération du script d'init depuis le dump legacy (cible `db-prepare`) ;
 - suppression de la base PostgreSQL locale ;
 - réimport du dump legacy ;
 - recréation des données initiales.
 
 À utiliser uniquement en développement.
+
+Détails sur l'import, le schéma et la documentation SchemaSpy : voir [développement / base de données](database.md) et [docs/database/README.md](../database/README.md).
 
 ---
 
