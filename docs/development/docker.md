@@ -5,6 +5,7 @@
 - Docker Desktop
 - Docker Compose
 - Make
+- [mkcert](https://github.com/FiloSottile/mkcert) (certificats HTTPS locaux)
 
 Le projet utilise Docker pour fournir un environnement de développement reproductible.
 
@@ -165,11 +166,13 @@ Détails sur l'import, le schéma et la documentation SchemaSpy : voir [dévelop
 
 | Service | Usage |
 |---|---|
-| PHP | Application Symfony |
+| PHP | PHP-FPM, exécute les applications Symfony |
+| webserver | nginx, pont HTTP entre Traefik et PHP-FPM (un `server{}` par app) |
+| traefik | Reverse proxy local, TLS, routage par domaine |
 | PostgreSQL | Base legacy migrée |
 | Redis | Cache et sessions |
 | Mailpit | Capture emails locaux |
-| db-docs | Doc du schéma (SchemaSpy), solution temporaire avant Traefik |
+| db-docs | Doc du schéma (SchemaSpy) |
 
 Le service `schemaspy` (profil `tools`) n'est pas dans cette liste : il génère la doc puis s'arrête, voir [database.md](database.md).
 
@@ -182,7 +185,34 @@ Le service `schemaspy` (profil `tools`) n'est pas dans cette liste : il génère
 | PostgreSQL | localhost:5432 |
 | Redis | localhost:6379 |
 | Mailpit | http://localhost:8025 |
-| db-docs | http://localhost:8090 |
+| db-docs (accès direct) | http://localhost:8090 |
+| Traefik (HTTP/HTTPS) | 80 / 443 |
+| Traefik (dashboard) | http://localhost:8080 |
+
+---
+
+# HTTPS local (Traefik)
+
+URLs servies via Traefik une fois les certificats générés et le fichier hosts
+configuré (voir [technical-debt.md](technical-debt.md#https-local)) :
+
+| URL | Application |
+|---|---|
+| https://exile.nexus.dev | Nexus |
+| https://game.exile.dev | Game |
+| https://s01.exile.dev | Game (instance s01) |
+| https://db.exile.dev | Documentation du schéma (SchemaSpy) |
+
+Générer/renouveler les certificats locaux (mkcert) :
+
+```bash
+make certs
+```
+
+À faire une seule fois par poste de développement : ajouter les domaines
+ci-dessus dans le fichier hosts Windows
+(`C:\Windows\System32\drivers\etc\hosts`, édition manuelle avec droits
+administrateur) pointant vers `127.0.0.1`.
 
 ---
 
@@ -202,10 +232,15 @@ Structure :
 ├── compose.yaml
 ├── php/
 │   └── Dockerfile
+├── nginx/
+│   └── default.conf
 ├── postgres/
 ├── redis/
 ├── mailpit/
 ├── traefik/
+│   ├── traefik.yml
+│   ├── dynamic/
+│   └── certs/        (généré par mkcert, gitignoré)
 └── schemaspy/
 ```
 

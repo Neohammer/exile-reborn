@@ -69,6 +69,13 @@ schema-doc:
 	$(COMPOSE) --profile tools run --rm schemaspy
 
 
+## Generate/renew local HTTPS certificates for *.exile.dev / *.nexus.dev (requires mkcert)
+certs:
+	mkcert -install
+	mkdir -p .docker/traefik/certs
+	mkcert -cert-file .docker/traefik/certs/exile-dev.pem -key-file .docker/traefik/certs/exile-dev-key.pem exile.nexus.dev game.exile.dev s01.exile.dev db.exile.dev
+
+
 ## Composer install for one app (default: nexus, override with APP=game)
 composer-install:
 	docker exec exile-php bash -c "cd /var/www/html/$(APP) && composer install"

@@ -127,6 +127,65 @@ services:
     networks:
       - exile-network
 
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.db-docs.rule=Host(`db.exile.dev`)
+      - traefik.http.routers.db-docs.entrypoints=websecure
+      - traefik.http.routers.db-docs.tls=true
+      - traefik.http.services.db-docs.loadbalancer.server.port=80
+
+
+  webserver:
+
+    container_name: exile-webserver
+
+    image: nginx:alpine
+
+    restart: unless-stopped
+
+    depends_on:
+      - php
+
+    volumes:
+      - ../apps:/var/www/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+    networks:
+      - exile-network
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.symfony.rule=Host(`exile.nexus.dev`) || Host(`game.exile.dev`) || Host(`s01.exile.dev`)
+      - traefik.http.routers.symfony.entrypoints=websecure
+      - traefik.http.routers.symfony.tls=true
+      - traefik.http.services.symfony.loadbalancer.server.port=80
+
+
+  traefik:
+
+    container_name: exile-traefik
+
+    image: traefik:v3.1
+
+    restart: unless-stopped
+
+    command:
+      - --configFile=/etc/traefik/traefik.yml
+
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+
+    volumes:
+      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      - ./traefik/certs:/etc/traefik/certs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+    networks:
+      - exile-network
+
 
 
 volumes:

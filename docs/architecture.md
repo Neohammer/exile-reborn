@@ -112,9 +112,13 @@ Services :
 | Service | Rôle |
 |---|---|
 | PHP | Application Symfony |
+| webserver (nginx) | Pont HTTP entre Traefik et PHP-FPM |
+| Traefik | Reverse proxy local, TLS (mkcert), routage par domaine |
 | PostgreSQL | Base historique |
 | Redis | Cache |
 | Mailpit | Emails locaux |
+
+Détails de configuration : [développement / docker.md](development/docker.md).
 
 ---
 

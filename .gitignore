@@ -11,6 +11,9 @@
 .docker/**/data/
 .docker/postgres/init/
 
+# Local HTTPS certificates (mkcert, never commit private keys)
+.docker/traefik/certs/
+
 # Generated documentation
 docs/database/generated/
 

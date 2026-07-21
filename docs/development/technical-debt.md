@@ -94,7 +94,7 @@ conf.d/
 
 ## Traefik et certificats
 
-Statut : À faire
+Statut : Fait
 
 Priorité : Haute
 
@@ -108,26 +108,45 @@ https://game.exile.dev
 
 https://s01.exile.dev
 
-https://db.exile.dev (documentation du schéma, voir ci-dessous)
+https://db.exile.dev (documentation du schéma)
 
 avec certificats locaux valides.
 
-## Solution prévue
+## Solution
 
-Traefik comme reverse proxy local.
+- **Traefik** (`traefik:v3.1`, service `traefik`) : reverse proxy local,
+  provider Docker (`exposedByDefault: false`, routage par labels
+  `traefik.http.routers.*`) + provider file pour le TLS
+  (`.docker/traefik/dynamic/tls.yml`). Dashboard sur `http://localhost:8080`
+  (mode insecure, dev uniquement). Entrypoint `web` (80) redirige vers
+  `websecure` (443).
+- **Certificats** : générés avec mkcert (`make certs`), stockés dans
+  `.docker/traefik/certs/` (gitignoré, jamais commité). Un seul certificat
+  multi-SAN couvre les 4 domaines. Nécessite `mkcert -install` une fois par
+  poste pour que la CA locale soit approuvée par le système/les navigateurs.
+- **webserver** (nginx, service `webserver`) : sert de pont entre Traefik et
+  PHP-FPM, un `server{}` par app dans `.docker/nginx/default.conf`
+  (`exile.nexus.dev` → `apps/nexus/public`, `game.exile.dev`/`s01.exile.dev`
+  → `apps/game/public`). Traefik ne parle pas FastCGI directement, ce nginx
+  est donc obligatoire entre lui et `php-fpm`.
+- **db-docs** garde son port direct `8090` en plus du routage Traefik (double
+  accès, sans impact).
 
-Gestion certificat :
+## Reste à faire
 
-- mkcert ;
-- certificat de développement local ;
-- confiance système Windows.
+- ajouter les entrées suivantes dans le fichier hosts de la machine
+  (`C:\Windows\System32\drivers\etc\hosts`, édition manuelle avec droits
+  administrateur) :
 
-## Solution temporaire
+  ```
+  127.0.0.1 exile.nexus.dev
+  127.0.0.1 game.exile.dev
+  127.0.0.1 s01.exile.dev
+  127.0.0.1 db.exile.dev
+  ```
 
-En attendant, la documentation SchemaSpy est servie par un conteneur nginx
-statique (service `db-docs`) directement accessible sur
-`http://localhost:8090`, sans domaine ni HTTPS. À remplacer par
-`https://db.exile.dev` une fois Traefik en place.
+- un schéma PostgreSQL dédié par instance de jeu (`s02`, `s03`, ...) impliquera
+  autant de `server{}` nginx / routers Traefik supplémentaires.
 
 ---
 
