@@ -37,7 +37,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
-      - ../../exile_original/db/exile.sql:/docker-entrypoint-initdb.d/exile.sql
+      - ./postgres/init:/docker-entrypoint-initdb.d
 
 
     networks:
@@ -70,6 +70,59 @@ services:
     ports:
       - "8025:8025"
       - "1025:1025"
+
+    networks:
+      - exile-network
+
+
+  schemaspy:
+
+    container_name: exile-schemaspy
+
+    image: schemaspy/schemaspy:latest
+
+    profiles:
+      - tools
+
+    depends_on:
+      - postgres
+
+    volumes:
+      - ../docs/database/generated:/output
+
+    command:
+      - -t
+      - pgsql
+      - -host
+      - postgres
+      - -port
+      - "5432"
+      - -db
+      - exile
+      - -u
+      - exile
+      - -p
+      - exile
+      - -schemas
+      - public,exile_nexus,exile_s03,static
+
+    networks:
+      - exile-network
+
+
+  db-docs:
+
+    container_name: exile-db-docs
+
+    image: nginx:alpine
+
+    restart: unless-stopped
+
+    volumes:
+      - ../docs/database/generated:/usr/share/nginx/html:ro
+
+    ports:
+      - "8090:80"
 
     networks:
       - exile-network

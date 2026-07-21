@@ -4,8 +4,13 @@ DOCKER_DIR=.docker
 COMPOSE=docker compose -f $(DOCKER_DIR)/compose.yaml
 
 
+## Generate PostgreSQL init script from the legacy dump
+db-prepare:
+	bash scripts/db/generate-init-sql.sh
+
+
 ## Start environment
-start:
+start: db-prepare
 	$(COMPOSE) up -d --build
 
 
@@ -51,9 +56,14 @@ build:
 
 ## Reset database completely
 ## WARNING: deletes Docker volumes
-reset-db:
+reset-db: db-prepare
 	$(COMPOSE) down -v
 	$(COMPOSE) up -d
+
+
+## Generate database schema documentation (SchemaSpy)
+schema-doc:
+	$(COMPOSE) --profile tools run --rm schemaspy
 
 
 ## Composer install in PHP container
