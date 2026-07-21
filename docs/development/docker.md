@@ -88,6 +88,17 @@ Le conteneur contient :
 - Composer
 - Extensions Symfony nécessaires
 
+Le volume `apps/` est monté sur `/var/www/html` : chaque application Symfony
+vit dans son propre sous-dossier (`apps/nexus`, `apps/game`, ...). Pour lancer
+Composer ou une commande Symfony directement sans ouvrir de shell :
+
+```bash
+make composer-install APP=nexus
+make cache-clear APP=nexus
+```
+
+`APP` vaut `nexus` par défaut.
+
 ---
 
 ## Shell PostgreSQL

@@ -135,7 +135,7 @@ statique (service `db-docs`) directement accessible sur
 
 ## Installation framework
 
-Statut : À faire
+Statut : Nexus fait, Game à faire
 
 Priorité : Haute
 
@@ -154,6 +154,27 @@ avec :
 - Bootstrap ;
 - Doctrine ;
 - PHPUnit.
+
+## Solution (Nexus)
+
+`apps/nexus` initialisé via `composer create-project symfony/skeleton`
+(Symfony 8.1), puis packs ajoutés un par un :
+
+- `composer require twig` ;
+- `composer require symfony/orm-pack` (Doctrine ORM + migrations) ;
+- `composer require --dev symfony/test-pack` (PHPUnit).
+
+`DATABASE_URL` réel dans `apps/nexus/.env.local` (gitignoré) :
+`postgresql://exile:exile@postgres:5432/exile?serverVersion=10&charset=utf8`.
+Connexion à la base et `bin/phpunit` vérifiés.
+
+`Makefile` : `composer-install` et `cache-clear` acceptent désormais un
+paramètre `APP` (défaut `nexus`), ex. `make cache-clear APP=game`.
+
+Bootstrap (assets frontend) pas encore intégré — à faire avec la première
+vraie page Twig.
+
+`apps/game` reste à initialiser sur le même modèle.
 
 ---
 
