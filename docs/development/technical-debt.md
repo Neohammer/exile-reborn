@@ -135,7 +135,7 @@ statique (service `db-docs`) directement accessible sur
 
 ## Installation framework
 
-Statut : Nexus fait, Game à faire
+Statut : Fait (Nexus et Game)
 
 Priorité : Haute
 
@@ -174,7 +174,16 @@ paramètre `APP` (défaut `nexus`), ex. `make cache-clear APP=game`.
 Bootstrap (assets frontend) pas encore intégré — à faire avec la première
 vraie page Twig.
 
-`apps/game` reste à initialiser sur le même modèle.
+## Solution (Game)
+
+`apps/game` initialisé exactement de la même façon (skeleton, twig,
+orm-pack, test-pack), même `.env.local` pointant vers la base `exile`.
+Connexion et `bin/phpunit` vérifiés.
+
+Point ouvert : chaque instance de serveur de jeu correspond à un schéma
+PostgreSQL dédié (`exile_s03` actuellement, futurs `exile_s01`/`exile_s02`).
+Le mapping Doctrine vers ces schémas (search_path / schema_filter) n'est pas
+encore configuré — à faire quand les premières entités seront créées.
 
 ---
 
