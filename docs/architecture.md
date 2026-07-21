@@ -58,7 +58,7 @@ Responsabilités :
 URL locale :
 
 ```
-https://exile.nexus.dev
+https://nexus.exile.dev
 ```
 
 ---

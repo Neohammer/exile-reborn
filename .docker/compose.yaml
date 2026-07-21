@@ -68,11 +68,17 @@ services:
     restart: unless-stopped
 
     ports:
-      - "8025:8025"
       - "1025:1025"
 
     networks:
       - exile-network
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.mailpit.rule=Host(`mailpit.exile.dev`)
+      - traefik.http.routers.mailpit.entrypoints=websecure
+      - traefik.http.routers.mailpit.tls=true
+      - traefik.http.services.mailpit.loadbalancer.server.port=8025
 
 
   schemaspy:
@@ -121,9 +127,6 @@ services:
     volumes:
       - ../docs/database/generated:/usr/share/nginx/html:ro
 
-    ports:
-      - "8090:80"
-
     networks:
       - exile-network
 
@@ -155,7 +158,7 @@ services:
 
     labels:
       - traefik.enable=true
-      - traefik.http.routers.symfony.rule=Host(`exile.nexus.dev`) || Host(`game.exile.dev`) || Host(`s01.exile.dev`)
+      - traefik.http.routers.symfony.rule=Host(`nexus.exile.dev`) || Host(`game.exile.dev`) || Host(`s01.exile.dev`)
       - traefik.http.routers.symfony.entrypoints=websecure
       - traefik.http.routers.symfony.tls=true
       - traefik.http.services.symfony.loadbalancer.server.port=80
@@ -174,7 +177,6 @@ services:
 
     ports:
       - "443:443"
-      - "8080:8080"
 
     volumes:
       - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
@@ -184,6 +186,13 @@ services:
 
     networks:
       - exile-network
+
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.dashboard.rule=Host(`traefik.exile.dev`)
+      - traefik.http.routers.dashboard.entrypoints=websecure
+      - traefik.http.routers.dashboard.tls=true
+      - traefik.http.routers.dashboard.service=api@internal
 
 
 

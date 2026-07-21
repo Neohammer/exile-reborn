@@ -180,14 +180,16 @@ Le service `schemaspy` (profil `tools`) n'est pas dans cette liste : il génère
 
 # Ports locaux
 
+Seuls les ports non-HTTP (accès direct par un client, pas un navigateur)
+restent publiés. Tout le reste (dashboard Traefik, Mailpit, doc du schéma,
+apps Symfony) passe uniquement par les domaines `*.exile.dev` en HTTPS.
+
 | Service | Adresse |
 |---|---|
 | PostgreSQL | localhost:5432 |
 | Redis | localhost:6379 |
-| Mailpit | http://localhost:8025 |
-| db-docs (accès direct) | http://localhost:8090 |
+| Mailpit (SMTP) | localhost:1025 |
 | Traefik (HTTPS uniquement) | 443 |
-| Traefik (dashboard) | http://localhost:8080 |
 
 ---
 
@@ -200,21 +202,27 @@ make urls
 Rappelle les URLs disponibles ainsi que les prérequis (`make certs` et les
 entrées à ajouter dans le fichier hosts).
 
-URLs servies via Traefik une fois les certificats générés et le fichier hosts
+URLs servies via Traefik une fois le certificat généré et le fichier hosts
 configuré (voir [technical-debt.md](technical-debt.md#https-local)) :
 
 | URL | Application |
 |---|---|
-| https://exile.nexus.dev | Nexus |
+| https://nexus.exile.dev | Nexus |
 | https://game.exile.dev | Game |
 | https://s01.exile.dev | Game (instance s01) |
 | https://db.exile.dev | Documentation du schéma (SchemaSpy) |
+| https://traefik.exile.dev | Dashboard Traefik |
+| https://mailpit.exile.dev | Interface Mailpit |
 
-Générer/renouveler les certificats locaux (mkcert) :
+Générer/renouveler le certificat local (mkcert) :
 
 ```bash
 make certs
 ```
+
+Certificat wildcard (`*.exile.dev` + `exile.dev`) : tout nouveau sous-domaine
+Traefik fonctionne sans regénérer de certificat, il suffit de l'ajouter au
+fichier hosts et de créer le router correspondant.
 
 À faire une seule fois par poste de développement : ajouter les domaines
 ci-dessus dans le fichier hosts Windows

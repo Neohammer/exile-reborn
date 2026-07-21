@@ -46,7 +46,7 @@ Responsabilités :
 
 URL locale prévue :
 
-https://exile.nexus.dev
+https://nexus.exile.dev
 
 
 ### Game
