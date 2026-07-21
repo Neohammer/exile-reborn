@@ -64,3 +64,32 @@ composer-install:
 ## Clear Symfony cache
 cache-clear:
 	docker exec exile-php php bin/console cache:clear
+
+## Environment diagnostics
+doctor:
+	@echo "== Docker containers =="
+	@$(COMPOSE) ps
+	@echo ""
+
+	@echo "== PHP version =="
+	@docker exec exile-php php -v || true
+	@echo ""
+
+	@echo "== PHP extensions =="
+	@docker exec exile-php php -m | grep -E "intl|pdo_pgsql|redis|zip" || true
+	@echo ""
+
+	@echo "== Composer =="
+	@docker exec exile-php composer --version || true
+	@echo ""
+
+	@echo "== Redis =="
+	@docker exec exile-redis redis-cli ping || true
+	@echo ""
+
+	@echo "== PostgreSQL =="
+	@docker exec exile-postgres pg_isready || true
+	@echo ""
+
+	@echo "== Mailpit =="
+	@echo "Open http://localhost:8025"

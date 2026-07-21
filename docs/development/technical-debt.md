@@ -10,9 +10,10 @@ Les éléments listés ici ne sont pas oubliés : ils représentent des amélior
 
 ## OPcache
 
-Statut : Reporté
+Statut : À configurer
 
-Priorité : Moyenne
+L'extension est présente dans PHP 8.5.
+Il reste uniquement la configuration dev/prod.
 
 ## Contexte
 
