@@ -1,0 +1,18 @@
+# Environment
+.env
+.docker/.env
+
+# Symfony
+/vendor/
+/var/
+/node_modules/
+
+# Docker generated
+.docker/**/data/
+
+# Generated documentation
+docs/database/generated/
+
+# IDE
+.idea/
+.vscode/

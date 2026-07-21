@@ -1,0 +1,88 @@
+services:
+
+  php:
+    container_name: exile-php
+
+    build:
+      context: ./php
+
+    volumes:
+      - ../apps:/var/www/html
+
+    working_dir: /var/www/html
+
+    depends_on:
+      - postgres
+      - redis
+
+    networks:
+      - exile-network
+
+
+  postgres:
+    container_name: exile-postgres
+
+    image: postgres:10
+
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: exile
+      POSTGRES_USER: exile
+      POSTGRES_PASSWORD: exile
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+      - ../../exile_original/db/exile.sql:/docker-entrypoint-initdb.d/exile.sql
+
+
+    networks:
+      - exile-network
+
+
+  redis:
+
+    container_name: exile-redis
+
+    image: redis:7-alpine
+
+    restart: unless-stopped
+
+    ports:
+      - "6379:6379"
+
+    networks:
+      - exile-network
+
+
+  mailpit:
+
+    container_name: exile-mailpit
+
+    image: axllent/mailpit
+
+    restart: unless-stopped
+
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+    networks:
+      - exile-network
+
+
+
+volumes:
+
+  postgres-data:
+
+
+
+networks:
+
+  exile-network:
+    driver: bridge
