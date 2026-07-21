@@ -3,6 +3,9 @@
 DOCKER_DIR=.docker
 COMPOSE=docker compose -f $(DOCKER_DIR)/compose.yaml
 
+# Symfony app targeted by composer-install/cache-clear (nexus, game, ...)
+APP ?= nexus
+
 
 ## Generate PostgreSQL init script from the legacy dump
 db-prepare:
@@ -66,14 +69,14 @@ schema-doc:
 	$(COMPOSE) --profile tools run --rm schemaspy
 
 
-## Composer install in PHP container
+## Composer install for one app (default: nexus, override with APP=game)
 composer-install:
-	docker exec exile-php composer install
+	docker exec exile-php bash -c "cd /var/www/html/$(APP) && composer install"
 
 
-## Clear Symfony cache
+## Clear Symfony cache for one app (default: nexus, override with APP=game)
 cache-clear:
-	docker exec exile-php php bin/console cache:clear
+	docker exec exile-php bash -c "cd /var/www/html/$(APP) && php bin/console cache:clear"
 
 ## Environment diagnostics
 doctor:
