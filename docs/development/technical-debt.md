@@ -108,6 +108,8 @@ https://game.exile.dev
 
 https://s01.exile.dev
 
+https://db.exile.dev (documentation du schéma, voir ci-dessous)
+
 avec certificats locaux valides.
 
 ## Solution prévue
@@ -119,6 +121,13 @@ Gestion certificat :
 - mkcert ;
 - certificat de développement local ;
 - confiance système Windows.
+
+## Solution temporaire
+
+En attendant, la documentation SchemaSpy est servie par un conteneur nginx
+statique (service `db-docs`) directement accessible sur
+`http://localhost:8090`, sans domaine ni HTTPS. À remplacer par
+`https://db.exile.dev` une fois Traefik en place.
 
 ---
 

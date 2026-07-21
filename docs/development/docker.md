@@ -158,6 +158,9 @@ Détails sur l'import, le schéma et la documentation SchemaSpy : voir [dévelop
 | PostgreSQL | Base legacy migrée |
 | Redis | Cache et sessions |
 | Mailpit | Capture emails locaux |
+| db-docs | Doc du schéma (SchemaSpy), solution temporaire avant Traefik |
+
+Le service `schemaspy` (profil `tools`) n'est pas dans cette liste : il génère la doc puis s'arrête, voir [database.md](database.md).
 
 ---
 
@@ -168,6 +171,7 @@ Détails sur l'import, le schéma et la documentation SchemaSpy : voir [dévelop
 | PostgreSQL | localhost:5432 |
 | Redis | localhost:6379 |
 | Mailpit | http://localhost:8025 |
+| db-docs | http://localhost:8090 |
 
 ---
 

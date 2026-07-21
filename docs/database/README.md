@@ -47,6 +47,16 @@ Résultat dans `docs/database/generated/index.html` (fichiers générés, non ve
 
 À régénérer après toute modification du schéma.
 
+### Consultation en HTTP
+
+En attendant la mise en place de Traefik/mkcert (voir [technical-debt.md](../development/technical-debt.md#https-local)), la doc générée est servie directement par un conteneur nginx statique :
+
+```
+http://localhost:8090
+```
+
+Solution temporaire : une fois Traefik configuré, ce service sera exposé sous une URL type `https://db.exile.dev`.
+
 ---
 
 ## Accès
