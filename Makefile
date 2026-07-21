@@ -69,6 +69,39 @@ schema-doc:
 	$(COMPOSE) --profile tools run --rm schemaspy
 
 
+## Generate/renew the local wildcard HTTPS certificate for *.exile.dev (requires mkcert)
+certs:
+	mkcert -install
+	mkdir -p .docker/traefik/certs
+	mkcert -cert-file .docker/traefik/certs/exile-dev.pem -key-file .docker/traefik/certs/exile-dev-key.pem "*.exile.dev" exile.dev
+
+
+## List local HTTPS URLs and the hosts file entries they require
+urls:
+	@echo "== URLs locales (Traefik, HTTPS uniquement) =="
+	@echo "  https://nexus.exile.dev     Nexus"
+	@echo "  https://game.exile.dev      Game"
+	@echo "  https://s01.exile.dev       Game (instance s01)"
+	@echo "  https://db.exile.dev        Documentation du schema (SchemaSpy)"
+	@echo "  https://traefik.exile.dev   Dashboard Traefik"
+	@echo "  https://mailpit.exile.dev   Mailpit"
+	@echo ""
+	@echo "  Le certificat est un wildcard *.exile.dev : tout nouveau sous-domaine"
+	@echo "  fonctionne sans regenerer de certificat, il faut juste l'ajouter au hosts."
+	@echo ""
+	@echo "== Prerequis =="
+	@echo "  1. make certs   (genere le certificat wildcard via mkcert, une seule fois)"
+	@echo "  2. Ajouter ces lignes dans C:\\Windows\\System32\\drivers\\etc\\hosts"
+	@echo "     (edition manuelle, droits administrateur requis) :"
+	@echo ""
+	@echo "     127.0.0.1 nexus.exile.dev"
+	@echo "     127.0.0.1 game.exile.dev"
+	@echo "     127.0.0.1 s01.exile.dev"
+	@echo "     127.0.0.1 db.exile.dev"
+	@echo "     127.0.0.1 traefik.exile.dev"
+	@echo "     127.0.0.1 mailpit.exile.dev"
+
+
 ## Composer install for one app (default: nexus, override with APP=game)
 composer-install:
 	docker exec exile-php bash -c "cd /var/www/html/$(APP) && composer install"

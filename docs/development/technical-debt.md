@@ -94,7 +94,7 @@ conf.d/
 
 ## Traefik et certificats
 
-Statut : À faire
+Statut : Fait
 
 Priorité : Haute
 
@@ -102,32 +102,66 @@ Priorité : Haute
 
 Fournir les URLs locales :
 
-https://exile.nexus.dev
+https://nexus.exile.dev
 
 https://game.exile.dev
 
 https://s01.exile.dev
 
-https://db.exile.dev (documentation du schéma, voir ci-dessous)
+https://db.exile.dev (documentation du schéma)
+
+https://traefik.exile.dev (dashboard Traefik)
+
+https://mailpit.exile.dev (interface Mailpit)
 
 avec certificats locaux valides.
 
-## Solution prévue
+## Solution
 
-Traefik comme reverse proxy local.
+- **Traefik** (`traefik:v3.1`, service `traefik`) : reverse proxy local,
+  provider Docker (`exposedByDefault: false`, routage par labels
+  `traefik.http.routers.*`) + provider file pour le TLS
+  (`.docker/traefik/dynamic/tls.yml`). Seul l'entrypoint `websecure` (443)
+  est déclaré et publié : pas de port 80, pas de fallback HTTP, pas de port
+  dédié pour l'API/dashboard (`api.insecure` désactivé — le dashboard est
+  exposé via un router sur `websecure` comme n'importe quel autre service,
+  pointant vers le service interne `api@internal`).
+- **Certificats** : générés avec mkcert (`make certs`), stockés dans
+  `.docker/traefik/certs/` (gitignoré, jamais commité). Certificat wildcard
+  `*.exile.dev` + `exile.dev` : tout nouveau sous-domaine (`s02.exile.dev`,
+  futurs outils, ...) est automatiquement couvert, sans régénération.
+  Nécessite `mkcert -install` une fois par poste pour que la CA locale soit
+  approuvée par le système/les navigateurs.
+- **webserver** (nginx, service `webserver`) : sert de pont entre Traefik et
+  PHP-FPM, un `server{}` par app dans `.docker/nginx/default.conf`
+  (`nexus.exile.dev` → `apps/nexus/public`, `game.exile.dev`/`s01.exile.dev`
+  → `apps/game/public`). Traefik ne parle pas FastCGI directement, ce nginx
+  est donc obligatoire entre lui et `php-fpm`.
+- **db-docs** et **mailpit** sont uniquement accessibles via Traefik
+  (`db.exile.dev`, `mailpit.exile.dev`) : leurs ports directs (8090, 8025)
+  ont été retirés de `compose.yaml`. Seuls les ports non-HTTP nécessaires à
+  d'autres outils (PostgreSQL 5432, Redis 6379, SMTP Mailpit 1025) restent
+  publiés directement.
 
-Gestion certificat :
+## Reste à faire
 
-- mkcert ;
-- certificat de développement local ;
-- confiance système Windows.
+- ajouter les entrées suivantes dans le fichier hosts de la machine
+  (`C:\Windows\System32\drivers\etc\hosts`, édition manuelle avec droits
+  administrateur) :
 
-## Solution temporaire
+  ```
+  127.0.0.1 nexus.exile.dev
+  127.0.0.1 game.exile.dev
+  127.0.0.1 s01.exile.dev
+  127.0.0.1 db.exile.dev
+  127.0.0.1 traefik.exile.dev
+  127.0.0.1 mailpit.exile.dev
+  ```
 
-En attendant, la documentation SchemaSpy est servie par un conteneur nginx
-statique (service `db-docs`) directement accessible sur
-`http://localhost:8090`, sans domaine ni HTTPS. À remplacer par
-`https://db.exile.dev` une fois Traefik en place.
+  (`make urls` affiche cette liste à jour.)
+
+- un schéma PostgreSQL dédié par instance de jeu (`s02`, `s03`, ...) impliquera
+  autant de `server{}` nginx / routers Traefik supplémentaires.
 
 ---
 
