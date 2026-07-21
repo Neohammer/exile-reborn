@@ -76,6 +76,25 @@ certs:
 	mkcert -cert-file .docker/traefik/certs/exile-dev.pem -key-file .docker/traefik/certs/exile-dev-key.pem exile.nexus.dev game.exile.dev s01.exile.dev db.exile.dev
 
 
+## List local HTTPS URLs and the hosts file entries they require
+urls:
+	@echo "== URLs locales (Traefik, HTTPS uniquement) =="
+	@echo "  https://exile.nexus.dev   Nexus"
+	@echo "  https://game.exile.dev    Game"
+	@echo "  https://s01.exile.dev     Game (instance s01)"
+	@echo "  https://db.exile.dev      Documentation du schema (SchemaSpy)"
+	@echo ""
+	@echo "== Prerequis =="
+	@echo "  1. make certs   (genere le certificat local via mkcert)"
+	@echo "  2. Ajouter ces lignes dans C:\\Windows\\System32\\drivers\\etc\\hosts"
+	@echo "     (edition manuelle, droits administrateur requis) :"
+	@echo ""
+	@echo "     127.0.0.1 exile.nexus.dev"
+	@echo "     127.0.0.1 game.exile.dev"
+	@echo "     127.0.0.1 s01.exile.dev"
+	@echo "     127.0.0.1 db.exile.dev"
+
+
 ## Composer install for one app (default: nexus, override with APP=game)
 composer-install:
 	docker exec exile-php bash -c "cd /var/www/html/$(APP) && composer install"

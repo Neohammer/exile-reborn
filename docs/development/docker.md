@@ -193,6 +193,13 @@ Le service `schemaspy` (profil `tools`) n'est pas dans cette liste : il génère
 
 # HTTPS local (Traefik)
 
+```bash
+make urls
+```
+
+Rappelle les URLs disponibles ainsi que les prérequis (`make certs` et les
+entrées à ajouter dans le fichier hosts).
+
 URLs servies via Traefik une fois les certificats générés et le fichier hosts
 configuré (voir [technical-debt.md](technical-debt.md#https-local)) :
 
