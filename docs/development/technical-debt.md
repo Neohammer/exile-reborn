@@ -10,27 +10,32 @@ Les éléments listés ici ne sont pas oubliés : ils représentent des amélior
 
 ## OPcache
 
-Statut : À configurer
+Statut : Fait
 
 L'extension est présente dans PHP 8.5.
-Il reste uniquement la configuration dev/prod.
 
 ## Contexte
 
 OPcache améliore les performances PHP en conservant le bytecode compilé en mémoire.
 
-L'installation avec PHP 8.5 dans l'image Docker actuelle présente un problème lors de l'étape :
+`docker-php-ext-install opcache` échoue sur PHP 8.5 : le `config.m4` de
+l'extension déclare `shared=no`, elle ne peut donc pas être compilée comme
+module chargeable via phpize/standalone. En réalité ce n'est pas nécessaire :
+l'image officielle `php:8.5-fpm` compile déjà OPcache en dur dans le binaire
+(visible directement dans `php -m`, sans aucune étape d'installation).
 
-docker-php-ext-install opcache
+## Solution
 
-Le démarrage de l'environnement ne doit pas être bloqué pour cette optimisation.
+Seule la configuration restait à faire :
+`.docker/php/conf.d/opcache.ini`, copié dans l'image par le `Dockerfile` :
 
-## À faire
+- `opcache.validate_timestamps = 1`, `opcache.revalidate_freq = 0` : les
+  changements de code sont pris en compte à chaque requête (profil
+  développement) ;
+- `opcache.memory_consumption = 128`, `opcache.max_accelerated_files = 10000`.
 
-- vérifier la méthode d'installation compatible PHP 8.5 ;
-- ajouter une configuration dédiée :
-  - développement : revalidation des fichiers activée ;
-  - production : revalidation désactivée.
+Une image de production distincte devra désactiver `validate_timestamps`
+pour les performances.
 
 ---
 
@@ -38,7 +43,7 @@ Le démarrage de l'environnement ne doit pas être bloqué pour cette optimisati
 
 ## Xdebug
 
-Statut : À faire
+Statut : Fait
 
 Priorité : Haute
 
@@ -56,13 +61,26 @@ Utilisations :
 
 Xdebug ne doit pas être activé en production.
 
+## Solution
+
+Installé via `pecl install xdebug` dans `.docker/php/Dockerfile`, configuré
+dans `.docker/php/conf.d/xdebug.ini` :
+
+- `xdebug.mode = debug,coverage` ;
+- `xdebug.client_host = host.docker.internal` (PhpStorm sur l'hôte Windows) ;
+- `xdebug.start_with_request = yes`.
+
+Le `Dockerfile` du service `php` porte un commentaire explicite rappelant
+qu'il s'agit d'une image de développement (Xdebug + `display_errors`) et
+qu'une image de production distincte devra les retirer.
+
 ---
 
 # Configuration PHP
 
 ## php.ini personnalisé
 
-Statut : À faire
+Statut : Fait
 
 Priorité : Haute
 
@@ -80,13 +98,12 @@ Ajouter une configuration PHP adaptée au projet Symfony.
 - logs ;
 - OPcache.
 
-Structure prévue :
+## Solution
 
-.docker/php/
-
-php.ini
-
-conf.d/
+`.docker/php/php.ini` (memory_limit 512M, upload_max_filesize/post_max_size
+64M, date.timezone UTC, display_errors on, log_errors vers
+`/var/log/php/error.log`) et `.docker/php/conf.d/` (`opcache.ini`,
+`xdebug.ini`), copiés dans l'image par le `Dockerfile`.
 
 ---
 
@@ -315,7 +332,7 @@ Voir [docs/database/README.md](../database/README.md) pour le détail des schém
 
 ## PHPStan
 
-Statut : À faire
+Statut : Fait
 
 Priorité : Moyenne
 
@@ -323,16 +340,31 @@ Objectif :
 
 Ajouter progressivement l'analyse statique.
 
-Approche :
+## Solution
 
-- démarrage permissif ;
-- augmentation progressive du niveau.
+`phpstan/phpstan` + `phpstan/phpstan-symfony` + `phpstan/phpstan-deprecation-rules`
+ajoutés en dev dependency dans `apps/nexus` et `apps/game`. Config
+`phpstan.dist.neon` par app (`paths: [src]`, extension Symfony pointant sur
+le conteneur compilé `var/cache/dev/App_KernelDevDebugContainer.xml`).
+
+Niveau directement à **8** (pas de montée progressive) plus
+`phpstan-deprecation-rules` pour détecter l'usage d'API PHP/Symfony/Doctrine
+deprecated dès l'écriture du code — préféré à PHPCompatibility (PHP_CodeSniffer),
+qui sert surtout à supporter plusieurs versions de PHP simultanément, non
+pertinent ici puisque le projet cible uniquement PHP 8.5.
+
+Un faux positif du skeleton Symfony (`Kernel::getAllowedEnvs()` signalé comme
+méthode inutilisée, alors qu'elle est appelée par le framework) est ignoré via
+`phpstan-baseline.neon` généré avec `--generate-baseline`, inclus dans
+`phpstan.dist.neon`.
+
+Commande : `make phpstan APP=nexus` (ou `APP=game`).
 
 ---
 
 ## PHP-CS-Fixer
 
-Statut : À faire
+Statut : Fait
 
 Priorité : Moyenne
 
@@ -340,17 +372,62 @@ Objectif :
 
 Uniformiser le style PHP.
 
+## Solution
+
+`friendsofphp/php-cs-fixer` ajouté via la recette Symfony (génère
+`.php-cs-fixer.dist.php`, règle `@Symfony`). Fichiers du skeleton passés au
+fixer pour repartir sur une base propre.
+
+Commandes : `make cs-check APP=nexus` (dry-run avec diff),
+`make cs-fix APP=nexus` (applique les corrections).
+
 ---
 
 ## Rector
 
-Statut : À faire
+Statut : Fait
 
 Priorité : Faible
 
 Objectif :
 
 Aider aux transformations automatiques de code lors des migrations.
+
+## Solution
+
+`rector/rector` ajouté en dev dependency. `rector.php` par app :
+`LevelSetList::UP_TO_PHP_84` + `SymfonySetList::SYMFONY_64`, analyse `src/`.
+
+Commandes : `make rector-check APP=nexus` (dry-run),
+`make rector-fix APP=nexus` (applique).
+
+---
+
+# CI
+
+## GitHub Actions
+
+Statut : Fait
+
+Priorité : Moyenne
+
+## Objectif
+
+Faire tourner les vérifications qualité automatiquement sur chaque push/PR.
+
+## Solution
+
+`.github/workflows/ci.yml`, matrice `[nexus, game]`, PHP 8.5 via
+`shivammathur/setup-php` (plutôt que de builder l'image Docker complète en
+CI — plus rapide, extensions suffisantes : `pdo_pgsql, intl, zip, redis,
+opcache`). Par app : `composer validate --strict`, `composer install`,
+PHPStan, PHP-CS-Fixer (dry-run), Rector (dry-run), PHPUnit.
+
+Nécessite `name`/`description` dans chaque `composer.json` (ajoutés) pour que
+`composer validate --strict` passe.
+
+Pas (encore) de service PostgreSQL en CI : aucun test n'utilise la base pour
+l'instant. À ajouter quand les premières entités/tests Doctrine arriveront.
 
 ---
 
