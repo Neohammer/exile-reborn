@@ -98,7 +98,17 @@ make composer-install APP=nexus
 make cache-clear APP=nexus
 ```
 
-`APP` vaut `nexus` par défaut.
+Qualité de code (voir [technical-debt.md](technical-debt.md)) :
+
+```bash
+make phpstan APP=nexus
+make cs-check APP=nexus     # dry-run avec diff
+make cs-fix APP=nexus       # applique les corrections
+make rector-check APP=nexus # dry-run
+make rector-fix APP=nexus   # applique
+```
+
+`APP` vaut `nexus` par défaut pour toutes ces cibles.
 
 ---
 

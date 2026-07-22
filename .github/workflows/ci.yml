@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    name: ${{ matrix.app }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [nexus, game]
+
+    defaults:
+      run:
+        working-directory: apps/${{ matrix.app }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: pdo_pgsql, intl, zip, redis, opcache
+          coverage: none
+
+      - name: Validate composer.json
+        run: composer validate --strict
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-${{ matrix.app }}-${{ hashFiles(format('apps/{0}/composer.lock', matrix.app)) }}
+          restore-keys: composer-${{ matrix.app }}-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse -c phpstan.dist.neon
+
+      - name: PHP-CS-Fixer (dry run)
+        run: vendor/bin/php-cs-fixer check --diff
+
+      - name: Rector (dry run)
+        run: vendor/bin/rector process --dry-run
+
+      - name: PHPUnit
+        env:
+          APP_ENV: test
+        run: vendor/bin/phpunit

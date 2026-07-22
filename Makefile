@@ -111,6 +111,31 @@ composer-install:
 cache-clear:
 	docker exec exile-php bash -c "cd /var/www/html/$(APP) && php bin/console cache:clear"
 
+
+## Static analysis for one app (default: nexus, override with APP=game)
+phpstan:
+	docker exec exile-php bash -c "cd /var/www/html/$(APP) && vendor/bin/phpstan analyse -c phpstan.dist.neon"
+
+
+## Check coding style for one app, no changes made (default: nexus, override with APP=game)
+cs-check:
+	docker exec exile-php bash -c "cd /var/www/html/$(APP) && vendor/bin/php-cs-fixer check --diff"
+
+
+## Fix coding style for one app (default: nexus, override with APP=game)
+cs-fix:
+	docker exec exile-php bash -c "cd /var/www/html/$(APP) && vendor/bin/php-cs-fixer fix"
+
+
+## Check Rector refactorings for one app, no changes made (default: nexus, override with APP=game)
+rector-check:
+	docker exec exile-php bash -c "cd /var/www/html/$(APP) && vendor/bin/rector process --dry-run"
+
+
+## Apply Rector refactorings for one app (default: nexus, override with APP=game)
+rector-fix:
+	docker exec exile-php bash -c "cd /var/www/html/$(APP) && vendor/bin/rector process"
+
 ## Environment diagnostics
 doctor:
 	@echo "== Docker containers =="
@@ -138,4 +163,4 @@ doctor:
 	@echo ""
 
 	@echo "== Mailpit =="
-	@echo "Open http://localhost:8025"
+	@echo "Open https://mailpit.exile.dev (make urls)"
