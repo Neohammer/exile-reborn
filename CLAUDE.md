@@ -10,6 +10,11 @@ Objectif principal :
 
 La priorité est la fonctionnalité avant la perfection architecturale.
 
+Index de toute la documentation : [docs/README.md](docs/README.md).
+Plan de travail (prochaine étape concrète, ordre à suivre) : [docs/roadmap.md](docs/roadmap.md).
+État d'avancement détaillé (ce qui est fait, ce qui reste, pourquoi) :
+[docs/development/technical-debt.md](docs/development/technical-debt.md).
+
 ---
 
 # Architecture générale
@@ -89,10 +94,15 @@ Services principaux :
 
 | Service | Rôle |
 |---|---|
-| PHP | Symfony / PHP 8.5 |
+| PHP | Symfony / PHP 8.5 (Xdebug + php.ini custom, dev uniquement) |
+| webserver (nginx) | Pont HTTP entre Traefik et PHP-FPM |
+| traefik | Reverse proxy local, HTTPS uniquement, domaines `*.exile.dev` |
 | PostgreSQL | Base legacy migrée |
 | Redis | Cache et données temporaires |
 | Mailpit | Emails locaux |
+
+URLs locales et prérequis (certificat, fichier hosts) : `make urls`.
+Détails : [docs/development/docker.md](docs/development/docker.md).
 
 ---
 
@@ -233,21 +243,23 @@ Priorités :
 3. tests sur les parties critiques ;
 4. refactoring progressif.
 
-Outils prévus :
+Outils en place dans `apps/nexus` et `apps/game` (`make phpstan|cs-check|cs-fix|rector-check|rector-fix APP=...`) :
 
 - PHPUnit ;
-- PHPStan ;
-- PHP-CS-Fixer ;
+- PHPStan (niveau 8 + phpstan-symfony + phpstan-deprecation-rules) ;
+- PHP-CS-Fixer (règle `@Symfony`) ;
 - Rector.
+
+CI GitHub Actions (`.github/workflows/ci.yml`) : exécute ces mêmes vérifications sur chaque push/PR, pour `nexus` et `game`.
 
 ---
 
 # Base de données et analyse
 
-Outils prévus :
+Outils :
 
 - DBeaver pour exploration SQL ;
-- SchemaSpy pour documentation automatique ;
+- SchemaSpy pour documentation automatique (`make schema-doc`, servi sur `db.exile.dev`) ;
 - scripts d'analyse dans :
 
 ```

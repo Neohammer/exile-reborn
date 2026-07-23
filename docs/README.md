@@ -4,6 +4,10 @@ Index de la documentation du projet. Voir aussi [CLAUDE.md](../CLAUDE.md) à la 
 
 ---
 
+## Plan de travail
+
+- [roadmap.md](roadmap.md) — ce qui est fait, la prochaine étape concrète, l'ordre à suivre.
+
 ## Architecture
 
 - [architecture.md](architecture.md) — architecture générale, applications, stratégie de migration, décisions techniques.
@@ -16,10 +20,10 @@ Index de la documentation du projet. Voir aussi [CLAUDE.md](../CLAUDE.md) à la 
 ## Développement
 
 - [development/docker.md](development/docker.md) — environnement Docker, commandes `make`.
-- [development/workflow.md](development/workflow.md) — workflow de développement. *(à venir)*
+- [development/workflow.md](development/workflow.md) — branches, PR, qualité avant push, CI.
 - [development/technical-debt.md](development/technical-debt.md) — suivi des sujets reportés.
 
 ## Migration
 
-- [legacy/README.md](legacy/README.md) — description du dépôt legacy `exile_original`. *(à venir)*
-- [migration/README.md](migration/README.md) — stratégie de migration ASP → Symfony. *(à venir)*
+- [legacy/README.md](legacy/README.md) — description du dépôt legacy `exile_original`.
+- [migration/README.md](migration/README.md) — stratégie de migration ASP → Symfony, état actuel.
