@@ -429,6 +429,20 @@ Nécessite `name`/`description` dans chaque `composer.json` (ajoutés) pour que
 Pas (encore) de service PostgreSQL en CI : aucun test n'utilise la base pour
 l'instant. À ajouter quand les premières entités/tests Doctrine arriveront.
 
+## Piège rencontré
+
+Le premier run CI a échoué sur `composer install` (`cache:clear` post-install)
+avec `Unable to read the ".../apps/game/.env" environment file`. Cause : le
+`.gitignore` racine avait une règle `.env` non ancrée (destinée à
+`.docker/.env`) qui ignorait aussi silencieusement `apps/nexus/.env` et
+`apps/game/.env` — les fichiers par défaut de Symfony (pas de secrets,
+placeholders `!ChangeMe!`), qui n'avaient donc jamais été commités. `git
+status`/`git add` en local ne montraient rien d'anormal puisque les fichiers
+existaient déjà sur disque. Corrigé en ancrant la règle (`/.env`, racine
+uniquement) et en committant les deux `.env`. Symptôme à surveiller si un
+nouveau fichier attendu par un outil "disparaît" silencieusement : vérifier
+`git check-ignore -v <fichier>` avant de chercher ailleurs.
+
 ---
 
 # Règle
