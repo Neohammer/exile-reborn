@@ -11,6 +11,7 @@ Objectif principal :
 La priorité est la fonctionnalité avant la perfection architecturale.
 
 Index de toute la documentation : [docs/README.md](docs/README.md).
+Plan de travail (prochaine étape concrète, ordre à suivre) : [docs/roadmap.md](docs/roadmap.md).
 État d'avancement détaillé (ce qui est fait, ce qui reste, pourquoi) :
 [docs/development/technical-debt.md](docs/development/technical-debt.md).
 

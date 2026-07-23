@@ -33,6 +33,7 @@ exile_original/   Dépôt legacy ASP/PostgreSQL (jamais modifié, lecture seule)
 
 Index complet : [docs/README.md](docs/README.md).
 
+- [docs/roadmap.md](docs/roadmap.md) — plan de travail : fait, prochaine étape, ordre à suivre.
 - [docs/architecture.md](docs/architecture.md) — architecture générale et stratégie de migration.
 - [docs/development/technical-debt.md](docs/development/technical-debt.md) — état d'avancement détaillé (fait / reste à faire, avec le pourquoi).
 - [docs/development/workflow.md](docs/development/workflow.md) — workflow de développement (branches, qualité, CI).

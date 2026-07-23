@@ -4,6 +4,10 @@ Index de la documentation du projet. Voir aussi [CLAUDE.md](../CLAUDE.md) à la 
 
 ---
 
+## Plan de travail
+
+- [roadmap.md](roadmap.md) — ce qui est fait, la prochaine étape concrète, l'ordre à suivre.
+
 ## Architecture
 
 - [architecture.md](architecture.md) — architecture générale, applications, stratégie de migration, décisions techniques.
